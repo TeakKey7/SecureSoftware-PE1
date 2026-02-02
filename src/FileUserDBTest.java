@@ -1,8 +1,7 @@
 /**
  * CEN 4078 Programming Exercise 1
- * File Name: null.java
- * {DESCRIPTION}
- *
+ * File Name: FileUserDBTest.java
+ * JUnit tests for the FileUserDB class
  * @author Caleb Metz
  * @version 1.0
  */
@@ -10,9 +9,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

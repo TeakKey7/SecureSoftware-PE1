@@ -8,4 +8,5 @@
 public interface MFAProvider {
     public void enroll(User user, String input);
     public boolean verify(User user, String input);
+    public boolean validate(String input);
 }

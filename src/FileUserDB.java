@@ -8,9 +8,8 @@ import static java.nio.file.Files.*;
 
 /**
  * CEN 4078 Programming Exercise 1
- * File Name: null.java
- * {DESCRIPTION}
- *
+ * File Name: FileUserDB.java
+ * A file storage database for the users array
  * @author Caleb Metz
  * @version 1.0
  */
