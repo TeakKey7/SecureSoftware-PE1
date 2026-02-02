@@ -31,10 +31,6 @@ public class AuthService {
         return false;
     }
 
-    public boolean enrollMfa(String username, String input) {
-        return true;
-    }
-
     public boolean verifyMFA(String username, String input) {
         //Grammatically incorrect, logically good enough. Fails if SQL injection detected.
         if (!validator.noSQLInjection(username) || !validator.noSQLInjection(input)) {

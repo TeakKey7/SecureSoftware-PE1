@@ -105,5 +105,4 @@ class AuthServiceTest {
         boolean result = fakeDb.dbWasQueried;
         assertFalse(result, "Confirm MFA passes SQL injection check");
     }
-
 }
