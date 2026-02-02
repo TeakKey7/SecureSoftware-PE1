@@ -15,10 +15,10 @@ class AuthServiceTest {
     User alice = new User("alice", "Password123", 2000000000);
     //Mock written by Gemini
     class MockDB implements UserDataStore {
-        public boolean saveWasCalled = false;
-
+        public boolean dbWasQueried = false;
         @Override
         public Optional<User> findByUsername(String username) {
+            dbWasQueried = true;
             if (username.equals("alice")) {
                 return Optional.of(alice);
             }
@@ -27,14 +27,13 @@ class AuthServiceTest {
 
         @Override
         public void save(User user) {
-            this.saveWasCalled = true;
         }
 
         @Override
         public void delete(String userName) {
         }
     }
-    class MockMFA implements MFAProvider {
+    static class MockMFA implements MFAProvider {
         public boolean verifyWasCalled = false;
         @Override
         public void enroll(User user, String input) {
@@ -46,12 +45,21 @@ class AuthServiceTest {
             return true;
         }
     }
+    static class MockValidation extends Validation {
+        public boolean verifySQLInjectionWasCalled = false;
+        @Override
+        public boolean noSQLInjection(String input) {
+            return (!input.equals("Bad"));
+        }
+
+    }
 
     @Test
     void testLogin() {
         MockDB fakeDb = new MockDB();
         MockMFA mockMFA = new MockMFA();
-        AuthService service = new AuthService(fakeDb, new Validation(), mockMFA);
+        MockValidation mockValidation = new MockValidation();
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA);
 
         assertTrue(service.authenticate("alice", "Password123"), "True on correct login");
         assertFalse(service.authenticate("alice", "Password"), "False on bad password");
@@ -59,13 +67,43 @@ class AuthServiceTest {
     }
 
     @Test
-    void testIfMFAUsed() {
+    void testVerifyMFA() {
         MockDB fakeDb = new MockDB();
         MockMFA mockMFA = new MockMFA();
-        AuthService service = new AuthService(fakeDb, new Validation(), mockMFA);
+        MockValidation mockValidation = new MockValidation();
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA);
 
-        service.authenticate("alice", "Password123");
+        service.verifyMFA("alice", "2000000000");
 
-        assertTrue(mockMFA.verifyWasCalled, "True if authentication requires MFA");
+        assertTrue(mockMFA.verifyWasCalled, "True if authentication can verify MFA");
     }
+
+    @Test
+    void testSQLInjectionCheckCalledOnAuth() {
+        MockDB fakeDb = new MockDB();
+        MockMFA mockMFA = new MockMFA();
+        MockValidation mockValidation = new MockValidation();
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA);
+
+        String badInput = "Bad";
+
+        service.authenticate("alice", badInput);
+        boolean result = fakeDb.dbWasQueried;
+        assertFalse(result, "Ensure bad query was not passed on");
+
+    }
+    @Test
+    void testSQLInjectionCheckCalledOnMFA() {
+        MockDB fakeDb = new MockDB();
+        MockMFA mockMFA = new MockMFA();
+        MockValidation mockValidation = new MockValidation();
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA);
+
+        String badInput = "Bad";
+
+        service.verifyMFA("alice", badInput);
+        boolean result = fakeDb.dbWasQueried;
+        assertFalse(result, "Confirm MFA passes SQL injection check");
+    }
+
 }

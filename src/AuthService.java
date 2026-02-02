@@ -19,6 +19,10 @@ public class AuthService {
         this.mfaProvider = mfaProvider;
     }
     public boolean authenticate(String username, String password) {
+        //Grammatically incorrect, logically good enough. Fails if SQL injection detected.
+        if (!validator.noSQLInjection(username) || !validator.noSQLInjection(password)) {
+            return false;
+        }
         Optional<User> userOpt = userDB.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -32,6 +36,15 @@ public class AuthService {
     }
 
     public boolean verifyMFA(String username, String input) {
-        return true;
+        //Grammatically incorrect, logically good enough. Fails if SQL injection detected.
+        if (!validator.noSQLInjection(username) || !validator.noSQLInjection(input)) {
+            return false;
+        }
+        Optional<User> userOpt = userDB.findByUsername(username);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            return mfaProvider.verify(user, input);
+        }
+        return false;
     }
 }
