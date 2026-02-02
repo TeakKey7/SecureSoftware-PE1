@@ -23,9 +23,6 @@
 hs_err_pid*
 replay_pid*
 
-<<<<<<< HEAD
-out
-=======
 # Fortran module files
 *.mod
 *.smod
@@ -51,6 +48,5 @@ out
 .idea
 
 
->>>>>>> a89ff9e (Submission)
 default.txt
 *.zip
