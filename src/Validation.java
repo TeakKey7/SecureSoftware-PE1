@@ -58,18 +58,20 @@ public class Validation {
         //Meets all requirements
         return true;
     }
-
     public boolean noIntOverflow(String input) {
         if (input == null || input.isEmpty()) {
-            return false;
+            return false; //Confirm input is present
         }
         for (char c : input.toCharArray()) {
-            if (!Character.isDigit(c)) {
-                return false;
+            if (!Character.isDigit(c) && c != '-') {
+                return false; //Confirm input is only digits or minus sign
             }
         }
-        if (input.length() > 10) { return false; }
+        if (input.length() > 15) { return false; } //Don't overflow Long either
         long temp = Long.parseLong(input);
-        return (temp <= 2147483647 && temp >= -2147483648);
+        if (temp <= 2147483647 && temp >= -2147483648) {
+            return true; //CHANGE: moved this from SimpleMFA class to here so I could delete Validate
+        };
+        return false;
     }
 }

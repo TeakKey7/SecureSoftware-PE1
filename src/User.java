@@ -15,7 +15,7 @@ public class User {
         this.password = password;
         this.mfaCode = mfaCode;
     }
-
+    //CHANGE: new constructor to allow users to enroll in MFA at a later time. (would require more logic)
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;

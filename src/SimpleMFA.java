@@ -34,6 +34,6 @@ public class SimpleMFA implements MFAProvider{
             return false;
         }
         int code = Integer.parseInt(input);
-        return (code >= 1000000000); //Longer than 10 digits
+        return (code >= 1000000000); //Ensure code is 10 digits
     }
 }
