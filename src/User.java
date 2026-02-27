@@ -16,6 +16,12 @@ public class User {
         this.mfaCode = mfaCode;
     }
 
+    public User(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+        this.mfaCode = -1;
+    }
+
     public String getUserName() {
         return userName;
     }

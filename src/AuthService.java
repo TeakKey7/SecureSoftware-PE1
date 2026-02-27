@@ -19,7 +19,7 @@ public class AuthService {
             System.out.println("Invalid input detected.");
             return true;
         }
-        if(!mfaProvider.validate(mfaInput)) {
+        if(!validator.noIntOverflow(mfaInput)) {
             //Remove in prod
             System.out.println("Invalid code detected.");
             return true;
@@ -43,7 +43,7 @@ public class AuthService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (user.getPassword().equals(password)) {
-                return (user.getMfaCode() == Integer.parseInt(mfaInput));
+                return (mfaProvider.verify(user,mfaInput));
             };
         }
         return false;

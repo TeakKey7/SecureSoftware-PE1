@@ -46,7 +46,7 @@ replay_pid*
 
 #IntelliJ files
 .idea
-
+.idea/*
 
 default.txt
 *.zip

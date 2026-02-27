@@ -37,15 +37,14 @@ class AuthServiceTest {
         public boolean verifyWasCalled = false;
         public boolean validateWasCalled = false;
         @Override
-        public void enroll(User user, String input) {
-
+        public boolean enroll(User user, String input) {
+            return true; //FIXME
         }
         @Override
         public boolean verify(User user, String input) {
             verifyWasCalled = true;
             return true;
         }
-        @Override
         public boolean validate(String input) {
             validateWasCalled = true;
             return true;

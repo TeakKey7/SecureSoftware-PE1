@@ -60,6 +60,15 @@ public class Validation {
     }
 
     public boolean noIntOverflow(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        for (char c : input.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        if (input.length() > 10) { return false; }
         long temp = Long.parseLong(input);
         return (temp <= 2147483647 && temp >= -2147483648);
     }

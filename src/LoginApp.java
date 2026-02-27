@@ -13,7 +13,8 @@ public class LoginApp {
     public static void main(String[] args) {
 
         FileUserDB userdb = new FileUserDB("default.txt");
-        AuthService auth = new AuthService(userdb, new Validation(), new SimpleMFA());
+        Validation validator = new Validation();
+        AuthService auth = new AuthService(userdb, validator, new SimpleMFA(validator));
 
         //The MFA is kind of weird, I just hard coded it since it doesn't matter.
         // Let me know if you know what the MFA code I added means.

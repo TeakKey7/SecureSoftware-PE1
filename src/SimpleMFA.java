@@ -6,28 +6,32 @@
  * @version 1.0
  */
 public class SimpleMFA implements MFAProvider{
-    private Validation validator;
+    private final Validation validator;
+
+    public SimpleMFA(Validation validator) {
+        this.validator = validator;
+    }
 
     @Override
-    public void enroll(User user, String input) {
-
+    public boolean enroll(User user, String input) {
+        if (validate(input)) {
+            user.setMfaCode(Integer.parseInt(input));
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean verify(User user, String input) {
-        return true;
-    }
-    //This is not in the Validation class because of polymorphism/SRP
-    @Override
-    public boolean validate(String input) {
-        if (input == null || input.isEmpty()) {
+        if (!validate(input)) {
             return false;
         }
-
-        for (char c : input.toCharArray()) {
-            if (!Character.isDigit(c)) {
-                return false;
-            }
+        return (Integer.parseInt(input) == user.getMfaCode());
+    }
+    //This is needed to ensure the validation occurs on the concrete classes instead of the interface
+    private boolean validate(String input) {
+        if (!validator.noIntOverflow(input)) {
+            return false;
         }
         int code = Integer.parseInt(input);
         return (code >= 1000000000); //Longer than 10 digits
