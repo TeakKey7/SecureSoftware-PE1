@@ -12,9 +12,10 @@ public class AuthService {
     private final UserDataStore userDB;
     private final Validation validator;
     private final MFAProvider mfaProvider;
+    private final Cryptographer cryptographer;
 
-    private String alphaKey = "ARGOSROCK";
-    private int numberKey = 1963;
+    private String alphaKey;
+    private int numberKey;
 
     private boolean sanitizeFail(String username, String password, String mfaInput) {
         if (!validator.noSQLInjection(username) || !validator.noSQLInjection(password)) {
@@ -34,10 +35,29 @@ public class AuthService {
         return false;
     }
 
-    public AuthService(UserDataStore userDB, Validation validator, MFAProvider mfaProvider) {
+    public AuthService(UserDataStore userDB, Validation validator, MFAProvider mfaProvider, Cryptographer cryptographer) {
         this.userDB = userDB;
         this.validator = validator;
         this.mfaProvider = mfaProvider;
+        this.cryptographer = cryptographer;
+        alphaKey = "ARGOSRULE";
+        numberKey = 1963;
+    }
+
+    public AuthService(
+            UserDataStore userDB,
+            Validation validator,
+            MFAProvider mfaProvider,
+            Cryptographer cryptographer,
+            String alphaKey,
+            int numberKey
+    ) {
+        this.userDB = userDB;
+        this.validator = validator;
+        this.mfaProvider = mfaProvider;
+        this.cryptographer = cryptographer;
+        this.alphaKey = alphaKey;
+        this.numberKey = numberKey;
     }
 
     public User authenticate(String username, String password, String mfaInput) {
@@ -46,7 +66,7 @@ public class AuthService {
         Optional<User> userOpt = userDB.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (user.getPassword().equals(password)) {
+            if (user.getPassword().equals(cryptographer.encrypt(alphaKey, password))) {
                 if (mfaProvider.verify(user,mfaInput))
                 return user;
             };
@@ -59,7 +79,7 @@ public class AuthService {
         if (sanitizeFail(username, password, mfaCode)) return false;
         int code = Integer.parseInt(mfaCode);
         //Register the validated user
-        userDB.save(new User(username,password,code));
+        userDB.save(new User(username,cryptographer.encrypt(alphaKey, password),code));
         return true;
     }
     public boolean saveUser(User user) {

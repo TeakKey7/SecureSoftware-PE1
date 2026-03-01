@@ -22,12 +22,19 @@ public class LoginApp {
         AuthService auth = new AuthService(
                 userdb,
                 validator,
-                new SimpleMFA(validator)
+                new SimpleMFA(validator),
+                vigenere
         );
+        if (!userdb.findByUsername("scientist").isPresent()) {
+            auth.saveUser("scientist", "BlAckM3sa1", "1119199800");
+        }
+        if (!userdb.findByUsername("engineer").isPresent()) {
+            auth.saveUser("engineer", "G0rdonFr33", "1119199800");
+        }
+        if (!userdb.findByUsername("security").isPresent()) {
+            auth.saveUser("security", "Barn3yCal", "1119199800");
+        }
         //Removed test print statements from project 1. Encypted passwords
-        auth.saveUser("scientist", vigenere.encrypt(alphaKey, "BlAckM3sa1"), "1119199800");
-        auth.saveUser("engineer", vigenere.encrypt(alphaKey, "G0rdonFr33"), "1119199800");
-        auth.saveUser("security", vigenere.encrypt(alphaKey,"Barn3yCal"), "1119199800");
 
         String username;
         String password;
@@ -66,15 +73,8 @@ public class LoginApp {
             mfaString = scanner.nextLine();
         }
 
-        String encryptedPassword = vigenere.encrypt(alphaKey, password);
-
-        if (encryptedPassword.isEmpty()) {
-            System.out.println("Login failed.");
-            System.exit(1);
-        }
-
         System.out.println("\nAuthenticating...");
-        User userLogin = auth.authenticate(username,encryptedPassword,mfaString);
+        User userLogin = auth.authenticate(username,password,mfaString);
         if (userLogin != null) {
             AdminPanel adminPanel = new AdminPanel(auth, userLogin);
             adminPanel.start();
