@@ -15,21 +15,40 @@ public class VigenereTest {
     Vigenere vigenere = new Vigenere();
 
     String alphaKey = "ARGOSROCK";
+    int numberKey = 1963;
+
+    String basicAlpha = "ILikeCheesecake";
+    String basicAlphaResult = "ICoywTvgosviocv";
+
+    String fullPassword = "Password12345";
+    String fullPasswordResult = "Prygofff12009";
+
 
     @Test
     void testBasicAlphaEncrypt() {
-        String basicAlpha = "ILikeCheesecake";
-        String basicAlphaResult = "ICoywTvgosviocv";
 
         StringBuilder dummyStringBuilder = new StringBuilder();
 
         for (int i = 0; i < alphaKey.length(); i++) {
             dummyStringBuilder.append("A");
         }
+        String dummyString1 = dummyStringBuilder.toString();
 
-        String dummyString = dummyStringBuilder.toString();
+        dummyStringBuilder = new StringBuilder();
+        for (int i = 0; i < alphaKey.length(); i++) {
+            dummyStringBuilder.append("a");
+        }
+        String dummyString2 = dummyStringBuilder.toString();
 
-        assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString), "String of 'A's should return the key");
+        dummyStringBuilder = new StringBuilder();
+        for (int i = 0; i < alphaKey.length(); i++) {
+            dummyStringBuilder.append("0");
+        }
+        String dummyString3 = dummyStringBuilder.toString();
+
+        assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString1), "String of 'A's should return the key");
+        assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString1), "String of 'a's should return the key");
+        assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString1), "String of '0's should return the key");
         assertEquals(basicAlphaResult,vigenere.encrypt(alphaKey, basicAlpha), "Encrypt basic string");
 
 
@@ -37,8 +56,6 @@ public class VigenereTest {
 
     @Test
     void testFullAlphaEncrypt() {
-        String fullPassword = "Password12345";
-        String fullPasswordResult = "Prygofff12009";
 
         assertEquals(fullPasswordResult,vigenere.encrypt(alphaKey, fullPassword), "Encrypt full string");
     }
