@@ -42,17 +42,9 @@ public class VigenereTest {
         }
         String dummyString2 = dummyStringBuilder.toString();
 
-        dummyStringBuilder = new StringBuilder();
-        for (int i = 0; i < alphaKey.length(); i++) {
-            dummyStringBuilder.append("0");
-        }
-        String dummyString3 = dummyStringBuilder.toString();
-
         assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString1), "String of 'A's should return the key");
-        assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString1), "String of 'a's should return the key");
-        assertEquals(alphaKey, vigenere.encrypt(alphaKey, dummyString1), "String of '0's should return the key");
+        assertEquals(alphaKey.toLowerCase(), vigenere.encrypt(alphaKey, dummyString2), "String of 'a's should return the key");
         assertEquals(basicAlphaResult,vigenere.encrypt(alphaKey, basicAlpha), "Encrypt basic string");
-
 
     }
 
