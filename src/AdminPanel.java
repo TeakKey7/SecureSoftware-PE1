@@ -55,19 +55,24 @@ public class AdminPanel {
         System.out.println("Welcome, " + user.getUserName() + "!");
         while(!done) {
             printMenu();
-            int choice = scanner.nextInt();
-            switch (choice) {
-                case 1:
-                    updatePassword();
-                    break;
-                case 2:
-                    //newUser();
-                    break;
-                case 3:
-                    done = true;
-                    break;
-                default:
-                    System.out.println("Invalid option.");
+            String input = scanner.nextLine();
+            try {
+                int choice = Integer.parseInt(input);
+                switch (choice) {
+                    case 1:
+                        updatePassword();
+                        break;
+                    case 2:
+                        //newUser();
+                        break;
+                    case 3:
+                        done = true;
+                        break;
+                    default:
+                        System.out.println("Invalid option.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please input a valid integer!");
             }
         }
     }
