@@ -7,7 +7,7 @@ import java.util.Scanner;
  File Name: LoginApp.java
  Runs a CLI app to auto initialize a user database then allows a user to attempt login
  @author Caleb Metz
- @version 1.0
+ @version 2.0
  */
 
 public class LoginApp {
@@ -77,6 +77,7 @@ public class LoginApp {
         User userLogin = auth.authenticate(username,encryptedPassword,mfaString);
         if (userLogin != null) {
             AdminPanel adminPanel = new AdminPanel(auth, userLogin);
+            adminPanel.start();
         } else {
             System.out.println("Failed to login.");
             System.exit(1);
