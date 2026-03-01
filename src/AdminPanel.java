@@ -5,7 +5,7 @@ import java.util.Scanner;
  * File Name: AdminPanel.java
  * Admin panel for making changes to users
  * @author Caleb Metz
- * @version 1.0
+ * @version 2.2
  */
 public class AdminPanel {
 
@@ -14,9 +14,11 @@ public class AdminPanel {
     private Validation validator = new Validation();
     private Scanner scanner = new Scanner(System.in);
     private DefaultPassword defaultPassword = new DefaultPassword(validator);
+    private UserDataStore userDB;
 
-    public AdminPanel(AuthService authService, User user) {
+    public AdminPanel(AuthService authService, UserDataStore userDB, User user) {
         this.authService = authService;
+        this.userDB = userDB;
         this.user = user;
     }
 
@@ -28,7 +30,7 @@ public class AdminPanel {
 
     }
 
-    private void updatePassword() {
+    private String updatePassword() {
         int numAttempts = 2;
         String password;
         System.out.println(Validation.getPasswordPolicy());
@@ -36,16 +38,27 @@ public class AdminPanel {
         for (int i = 0; i < numAttempts; i++) {
             password = scanner.nextLine();
             if (validator.isValidPassword(password)) {
-                if (authService.saveUser(user.getUserName(), password, String.valueOf(user.getMfaCode()))) {
-                    System.out.println("Successfully changed password");
-                    return;
-                } else {
-                    System.out.println("Error occurred when saving user");
-                }
+                return password;
             }
             System.out.println("Please try again.");
         }
-        authService.saveUser(user.getUserName(), defaultPassword.generateDefaultPassword(), String.valueOf(user.getMfaCode()));
+        System.out.println("Too many attempts.");
+        return defaultPassword.generateDefaultPassword();
+    }
+
+    private boolean newUser() {
+        System.out.println("Please type the intended username");
+        String username = scanner.nextLine();
+        System.out.println("Please type the intended password");
+        String password = updatePassword();
+        System.out.println("Please type the intended MFACode");
+        String mfaCode = scanner.nextLine();
+
+        if (userDB.findByUsername(username).isPresent()) {
+            System.out.println("Unable to create user.");
+            return false;
+        }
+        return authService.saveUser(username, password, mfaCode);
     }
 
     public void start() {
@@ -60,10 +73,22 @@ public class AdminPanel {
                 int choice = Integer.parseInt(input);
                 switch (choice) {
                     case 1:
-                        updatePassword();
+                        if (authService.saveUser(
+                                user.getUserName(),
+                                updatePassword(),
+                                String.valueOf(user.getMfaCode())
+                        )) {
+                            System.out.println("Successfully updated password.");
+                        } else {
+                            System.out.println("Unable to change password.");
+                        }
                         break;
                     case 2:
-                        //newUser();
+                        if (newUser()) {
+                            System.out.println("Successfully created user.");
+                        } else {
+                            System.out.println("Unable to create user.");
+                        }
                         break;
                     case 3:
                         done = true;

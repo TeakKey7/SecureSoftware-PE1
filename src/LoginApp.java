@@ -76,7 +76,7 @@ public class LoginApp {
         System.out.println("\nAuthenticating...");
         User userLogin = auth.authenticate(username,password,mfaString);
         if (userLogin != null) {
-            AdminPanel adminPanel = new AdminPanel(auth, userLogin);
+            AdminPanel adminPanel = new AdminPanel(auth, userdb, userLogin);
             adminPanel.start();
         } else {
             System.out.println("Failed to login.");
