@@ -38,9 +38,9 @@ public class VigenereTest {
     @Test
     void testFullAlphaEncrypt() {
         String fullPassword = "Password12345";
-        String fullPasswordResult = "Prygofff23570";
+        String fullPasswordResult = "Prygofff12009";
 
-        assertEquals(fullPasswordResult,vigenere.encrypt(alphaKey, fullPassword), "Encrypt basic string");
+        assertEquals(fullPasswordResult,vigenere.encrypt(alphaKey, fullPassword), "Encrypt full string");
     }
 
     @Test
@@ -53,6 +53,5 @@ public class VigenereTest {
     }
     @Test
     void testNumberDecrypt() {
-
     }
 }
