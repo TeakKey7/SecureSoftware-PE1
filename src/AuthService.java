@@ -13,6 +13,9 @@ public class AuthService {
     private final Validation validator;
     private final MFAProvider mfaProvider;
 
+    private String alphaKey = "ARGOSROCK";
+    private int numberKey = 1963;
+
     private boolean sanitizeFail(String username, String password, String mfaInput) {
         if (!validator.noSQLInjection(username) || !validator.noSQLInjection(password)) {
             //Remove in prod
@@ -36,17 +39,19 @@ public class AuthService {
         this.validator = validator;
         this.mfaProvider = mfaProvider;
     }
-    public boolean authenticate(String username, String password, String mfaInput) {
+
+    public User authenticate(String username, String password, String mfaInput) {
         //Grammatically incorrect, logically good enough. Fails if SQL injection detected.
-        if (sanitizeFail(username, password, mfaInput)) return false;
+        if (sanitizeFail(username, password, mfaInput)) return null;
         Optional<User> userOpt = userDB.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (user.getPassword().equals(password)) {
-                return (mfaProvider.verify(user,mfaInput));
+                if (mfaProvider.verify(user,mfaInput))
+                return user;
             };
         }
-        return false;
+        return null;
     }
 
     public boolean saveUser(String username, String password, String mfaCode) {
@@ -55,6 +60,13 @@ public class AuthService {
         int code = Integer.parseInt(mfaCode);
         //Register the validated user
         userDB.save(new User(username,password,code));
+        return true;
+    }
+    public boolean saveUser(User user) {
+        //Ensure all input is valid
+        if (sanitizeFail(user.getUserName(), user.getPassword(), String.valueOf(user.getMfaCode()))) return false;
+        //Register the validated user
+        userDB.save(user);
         return true;
     }
 }
