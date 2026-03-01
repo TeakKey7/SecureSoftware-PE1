@@ -53,8 +53,13 @@ public class Vigenere implements Cryptographer {
 
         int offset = key - keyMin;
         //Gemini provided this solution when I was refactoring for decryption.
-        int direction = Character.isDigit(input) ? -1 : 1;
-        if (!encrypting) direction *= -1;
+        int direction;
+        if (Character.isDigit(input)) {
+            direction = encrypting ? -1 : 1;
+            inputAlphabetSize = 10;
+        } else {
+            direction = encrypting ? 1 : -1;
+        }
 
         int normalizedInput = input - inputMin;
 
@@ -89,9 +94,13 @@ public class Vigenere implements Cryptographer {
         return result.toString();
     }
     public int encrypt(int numberKey, int input) {
-        return input;
+        String encryptionKey = String.valueOf(numberKey);
+        String encryptionInput = String.valueOf(input);
+        return Integer.parseInt(encrypt(encryptionKey, encryptionInput));
     }
     public int decrypt(int numberKey, int input) {
-        return input;
+        String decryptionKey = String.valueOf(numberKey);
+        String decryptionInput = String.valueOf(input);
+        return Integer.parseInt(decrypt(decryptionKey, decryptionInput));
     }
 }

@@ -23,6 +23,8 @@ public class VigenereTest {
     String fullPassword = "Password12345";
     String fullPasswordResult = "Prygofff12681";
 
+    int basicNumber = 234567891;
+    int basicNumberResult = 148258260;
 
     @Test
     void testBasicAlphaEncrypt() {
@@ -76,9 +78,10 @@ public class VigenereTest {
     }
     @Test
     void testNumberEncrypt() {
-
+        assertEquals(basicNumberResult,vigenere.encrypt(numberKey, basicNumber), "Encrypt number");
     }
     @Test
     void testNumberDecrypt() {
+        assertEquals(basicNumber,vigenere.decrypt(numberKey, basicNumberResult), "Decrypt number");
     }
 }
