@@ -63,6 +63,16 @@ public class VigenereTest {
     @Test
     void testAlphaDecrypt() {
 
+        StringBuilder dummyStringBuilder = new StringBuilder();
+
+        for (int i = 0; i < alphaKey.length(); i++) {
+            dummyStringBuilder.append("A");
+        }
+        String dummyString1 = dummyStringBuilder.toString();
+
+        assertEquals(dummyString1, vigenere.decrypt(alphaKey, alphaKey), "Decrypting the key should return 'A's");
+        assertEquals(basicAlpha,vigenere.encrypt(alphaKey, basicAlphaResult), "Decrypt basic string");
+
     }
     @Test
     void testNumberEncrypt() {
