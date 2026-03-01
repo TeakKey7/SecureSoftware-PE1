@@ -46,7 +46,7 @@ public class DefaultPassword {
         return new int[]{numUpper, numLower, numDigit};
     }
 
-    public String generateDefaultPassword(Validation validator) {
+    public String generateDefaultPassword() {
 
         StringBuilder result = new StringBuilder();
 

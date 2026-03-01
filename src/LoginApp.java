@@ -1,4 +1,5 @@
 import java.io.Console;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.Scanner;
 
 /**
@@ -14,24 +15,19 @@ public class LoginApp {
 
         FileUserDB userdb = new FileUserDB("default.txt");
         Validation validator = new Validation();
-        AuthService auth = new AuthService(userdb, validator, new SimpleMFA(validator));
+        Cryptographer vigenere = new Vigenere();
 
-        //The MFA is kind of weird, I just hard coded it since it doesn't matter.
-        // Let me know if you know what the MFA code I added means.
-        System.out.println("Adding user: scientist.");
-        auth.saveUser("scientist", "Bl@ckM3sa!", "1119199800");
-        System.out.println("Adding user: engineer.");
-        auth.saveUser("engineer", "G0rdonFr33", "1119199800");
-        System.out.println("Adding user: security.");
-        auth.saveUser("security", "B@rn3yCal", "1119199800");
-        System.out.println("Adding user: test-.");
-        auth.saveUser("test-", "B@rn3yCal", "1119199800");
-        System.out.println("Adding user: test. Weak password test");
-        auth.saveUser("test", "B@rnyCal", "1119199800");
-        System.out.println("Adding user: test. Small MFA code test.");
-        auth.saveUser("test-", "B@rn3yCal", "11");
-        System.out.println("Adding user: test. Overflow test.");
-        auth.saveUser("test-", "B@rn3yCal", "11111111111111111111");
+        String alphaKey = "ARGOSROCK";
+
+        AuthService auth = new AuthService(
+                userdb,
+                validator,
+                new SimpleMFA(validator)
+        );
+        //Removed test print statements from project 1. Encypted passwords
+        auth.saveUser("scientist", vigenere.encrypt(alphaKey, "BlAckM3sa1"), "1119199800");
+        auth.saveUser("engineer", vigenere.encrypt(alphaKey, "G0rdonFr33"), "1119199800");
+        auth.saveUser("security", vigenere.encrypt(alphaKey,"Barn3yCal"), "1119199800");
 
         String username;
         String password;
@@ -70,11 +66,20 @@ public class LoginApp {
             mfaString = scanner.nextLine();
         }
 
+        String encryptedPassword = vigenere.encrypt(alphaKey, password);
+
+        if (encryptedPassword.isEmpty()) {
+            System.out.println("Login failed.");
+            System.exit(1);
+        }
+
         System.out.println("\nAuthenticating...");
-        if (auth.authenticate(username,password,mfaString)) {
-            System.out.println("Welcome, " + username);
+        User userLogin = auth.authenticate(username,encryptedPassword,mfaString);
+        if (userLogin != null) {
+            AdminPanel adminPanel = new AdminPanel(auth, userLogin);
         } else {
             System.out.println("Failed to login.");
+            System.exit(1);
         }
 
     }

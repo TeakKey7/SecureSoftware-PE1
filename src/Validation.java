@@ -75,7 +75,7 @@ public class Validation {
         return false;
     }
     //Added for V2
-    public String getPasswordPolicy() {
+    public static String getPasswordPolicy() {
 
         return "Password policy: \n" +
                 "1. Must be 8-12 characters\n" +
