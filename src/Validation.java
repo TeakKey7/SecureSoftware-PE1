@@ -8,7 +8,7 @@
  * At least one numeric character
  * Integer between -2,147,483,648 and 2,147,483,647
  * @author Caleb Metz
- * @version 1.0
+ * @version 1.2
  */
 public class Validation {
     private final char[] sensitiveChars;
@@ -73,5 +73,14 @@ public class Validation {
             return true; //CHANGE: moved this from SimpleMFA class to here so I could delete Validate
         };
         return false;
+    }
+    //Added for V2
+    public String getPasswordPolicy() {
+
+        return "Password policy: \n" +
+                "1. Must be 8-12 characters\n" +
+                "2. Must contain at least one uppercase letter\n" +
+                "3. Must contain at least one lowercase letter\n" +
+                "4. Must contain at least one digit\n";
     }
 }
