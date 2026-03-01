@@ -27,6 +27,25 @@ public class Vigenere implements Cryptographer {
         return "" + min + max;
     }
 
+    private int vigenere(int numberKey, int input, boolean encryption) {
+        String encryptionKey = String.valueOf(numberKey);
+        String encryptionInput = String.valueOf(input);
+        return Integer.parseInt(vigenere(encryptionKey, encryptionInput, encryption));
+    }
+
+    private String vigenere(String alphaKey, String input, boolean encryption) {
+        int keyLength = alphaKey.length();
+        int keyIndex = 0;
+
+        StringBuilder result = new StringBuilder();
+
+        for (char character: input.toCharArray()){
+            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character, encryption));
+        }
+
+        return result.toString();
+    }
+
     private char caesar(char key, char input, boolean encrypting) {
 
         String keyMinMax = findMinMax(key);
@@ -69,38 +88,15 @@ public class Vigenere implements Cryptographer {
     }
 
     public String encrypt(String alphaKey, String input) {
-
-        int keyLength = alphaKey.length();
-        int keyIndex = 0;
-        
-        StringBuilder result = new StringBuilder();
-        
-        for (char character: input.toCharArray()){
-            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character, true));
-        }
-
-        return result.toString();
+        return vigenere(alphaKey,input, true); //Call with encryption: true
     }
     public String decrypt(String alphaKey, String input) {
-        int keyLength = alphaKey.length();
-        int keyIndex = 0;
-
-        StringBuilder result = new StringBuilder();
-
-        for (char character: input.toCharArray()){
-            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character, false));
-        }
-
-        return result.toString();
+        return vigenere(alphaKey, input, false); //Call with encryption: false
     }
     public int encrypt(int numberKey, int input) {
-        String encryptionKey = String.valueOf(numberKey);
-        String encryptionInput = String.valueOf(input);
-        return Integer.parseInt(encrypt(encryptionKey, encryptionInput));
+        return vigenere(numberKey,input, true); //Call with encryption: true
     }
     public int decrypt(int numberKey, int input) {
-        String decryptionKey = String.valueOf(numberKey);
-        String decryptionInput = String.valueOf(input);
-        return Integer.parseInt(decrypt(decryptionKey, decryptionInput));
+        return vigenere(numberKey, input, false); //Call with encryption: false
     }
 }
