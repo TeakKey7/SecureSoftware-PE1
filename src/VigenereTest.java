@@ -21,7 +21,7 @@ public class VigenereTest {
     String basicAlphaResult = "ICoywTvgosviocv";
 
     String fullPassword = "Password12345";
-    String fullPasswordResult = "Prygofff12009";
+    String fullPasswordResult = "Prygofff12681";
 
 
     @Test

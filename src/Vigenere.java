@@ -54,7 +54,14 @@ public class Vigenere implements Cryptographer {
         int offset = key - keyMin;
         int normalizedInput = input - inputMin;
 
-        int desiredCharIndex = (normalizedInput + offset) % inputAlphabetSize;
+        int desiredCharIndex;
+
+        if (Character.isDigit(input)) {
+            // Gemini suggestion
+            desiredCharIndex = (normalizedInput - (offset % 10) + 10) % 10;
+        } else {
+            desiredCharIndex = (normalizedInput + offset) % inputAlphabetSize;
+        }
 
         return (char) (desiredCharIndex + inputMin);
     }
@@ -73,7 +80,16 @@ public class Vigenere implements Cryptographer {
         return result.toString();
     }
     public String decrypt(String alphaKey, String input) {
-        return input;
+        int keyLength = alphaKey.length();
+        int keyIndex = 0;
+
+        StringBuilder result = new StringBuilder();
+
+        for (char character: input.toCharArray()){
+            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character));
+        }
+
+        return result.toString();
     }
     public int encrypt(int numberKey, int input) {
         return input;
