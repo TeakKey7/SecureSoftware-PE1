@@ -3,10 +3,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * CEN 4078 Programming Exercise 1
- * File Name: null.java
- * {DESCRIPTION}
- *
+ * CEN 4078 Programming Exercise 2
+ * File Name: VigenereTest.java
+ * Tests the Vigenere class
  * @author Caleb Metz
  * @version 1.0
  */
