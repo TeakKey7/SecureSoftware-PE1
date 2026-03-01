@@ -27,7 +27,7 @@ public class Vigenere implements Cryptographer {
         return "" + min + max;
     }
 
-    private char caesar(char key, char input) {
+    private char caesar(char key, char input, boolean encrypting) {
 
         String keyMinMax = findMinMax(key);
         String inputMinMax = findMinMax(input);
@@ -52,16 +52,13 @@ public class Vigenere implements Cryptographer {
         inputAlphabetSize = inputMax - inputMin + 1; //Fix 0 based index issue
 
         int offset = key - keyMin;
+        //Gemini provided this solution when I was refactoring for decryption.
+        int direction = Character.isDigit(input) ? -1 : 1;
+        if (!encrypting) direction *= -1;
+
         int normalizedInput = input - inputMin;
 
-        int desiredCharIndex;
-
-        if (Character.isDigit(input)) {
-            // Gemini suggestion
-            desiredCharIndex = (normalizedInput - (offset % 10) + 10) % 10;
-        } else {
-            desiredCharIndex = (normalizedInput + offset) % inputAlphabetSize;
-        }
+        int desiredCharIndex = (normalizedInput + (direction * (offset % inputAlphabetSize)) + inputAlphabetSize) % inputAlphabetSize;
 
         return (char) (desiredCharIndex + inputMin);
     }
@@ -74,7 +71,7 @@ public class Vigenere implements Cryptographer {
         StringBuilder result = new StringBuilder();
         
         for (char character: input.toCharArray()){
-            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character));
+            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character, true));
         }
 
         return result.toString();
@@ -86,7 +83,7 @@ public class Vigenere implements Cryptographer {
         StringBuilder result = new StringBuilder();
 
         for (char character: input.toCharArray()){
-            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character));
+            result.append(caesar(alphaKey.charAt((keyIndex++ % keyLength)), character, false));
         }
 
         return result.toString();

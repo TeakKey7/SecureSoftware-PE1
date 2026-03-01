@@ -71,7 +71,7 @@ public class VigenereTest {
         String dummyString1 = dummyStringBuilder.toString();
 
         assertEquals(dummyString1, vigenere.decrypt(alphaKey, alphaKey), "Decrypting the key should return 'A's");
-        assertEquals(basicAlpha,vigenere.encrypt(alphaKey, basicAlphaResult), "Decrypt basic string");
+        assertEquals(basicAlpha,vigenere.decrypt(alphaKey, basicAlphaResult), "Decrypt basic string");
 
     }
     @Test
