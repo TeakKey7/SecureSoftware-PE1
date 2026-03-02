@@ -84,4 +84,14 @@ class ValidationTest {
     void noIntOverflow_goodBottom() {
         assertTrue(val.noIntOverflow("-2147483647"), "In bounds number should return true");
     }
+    @Test
+    void canChangeLength() {
+        Validation val2 = new Validation(sensitiveChars, 15, 20);
+        String newShort = "Password12345";
+        String newGood = "LongPassword12345";
+        String newLong = "ThisIsAVeryVeryVeryLongPassword12345";
+        assertTrue(val2.isValidPassword(newGood), "Between 15 and 20 passes");
+        assertFalse(val2.isValidPassword(newShort), "Below 15 now fails");
+        assertFalse(val2.isValidPassword(newLong), "Above 20 still fails");
+    }
 }

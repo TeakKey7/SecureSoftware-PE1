@@ -83,6 +83,7 @@ public class DefaultPassword {
         if (!validator.isValidPassword(finalString)) {
          return null;
         }
+        sendMessage();
         return finalString;
     }
 
