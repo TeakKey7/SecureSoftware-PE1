@@ -67,8 +67,9 @@ public class AuthService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (user.getPassword().equals(cryptographer.encrypt(alphaKey, password))) {
-                if (mfaProvider.verify(user,mfaInput))
-                return user;
+                if (mfaProvider.verify(user,mfaInput)) {
+                    return user;
+                }
             };
         }
         return null;

@@ -28,6 +28,11 @@ public class Validation {
     }
 
     public boolean noSQLInjection(String input) {
+
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
         for (char character : input.toCharArray()) {
             for (char special : sensitiveChars) {
                 if (special == character) {
@@ -75,12 +80,19 @@ public class Validation {
         return false;
     }
     //Added for V2
-    public static String getPasswordPolicy() {
+    public String getPasswordPolicy() {
 
         return "Password policy: \n" +
-                "1. Must be 8-12 characters\n" +
+                "1. Must be " + minLength + "-" + maxLength + " characters\n" +
                 "2. Must contain at least one uppercase letter\n" +
                 "3. Must contain at least one lowercase letter\n" +
                 "4. Must contain at least one digit\n";
+    }
+    public int getMinLength() {
+        return minLength;
+    }
+
+    public int getMaxLength() {
+        return maxLength;
     }
 }

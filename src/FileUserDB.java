@@ -11,10 +11,10 @@ import static java.nio.file.Files.*;
  * File Name: FileUserDB.java
  * A file storage database for the users array
  * @author Caleb Metz
- * @version 1.0
+ * @version 1.1
  */
 public class FileUserDB implements UserDataStore{
-    private ArrayList<User> users;
+    private ArrayList<User> users = new ArrayList<User>();
     private final String fileName;
 
     private int findIndex(String userName) {

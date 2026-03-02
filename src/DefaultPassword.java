@@ -21,8 +21,11 @@ public class DefaultPassword {
         this.validator = new Validation();
     }
 
-    private int[] bucketGenerator() {
-        int length = random.nextInt(5) + 8;
+    private int[] bucketGenerator(int minLength, int maxLength) {
+        if (minLength < 3) {
+            throw new IllegalArgumentException("minLength must be at least 3");
+        }
+        int length = random.nextInt((maxLength - minLength) + 1) + minLength;
 
         int numUpper = 1;
         int numLower = 1;
@@ -31,15 +34,19 @@ public class DefaultPassword {
         int remaining = length - 3;
 
         for (int i = 0; i < remaining; i++) {
+
             int bucket = random.nextInt(3);
 
             switch(bucket) {
                 case 0:
                     numUpper++;
+                    break;
                 case 1:
                     numLower++;
+                    break;
                 default:
                     numDigit++;
+                    break;
             }
         }
 
@@ -50,7 +57,7 @@ public class DefaultPassword {
 
         StringBuilder result = new StringBuilder();
 
-        int[] buckets = bucketGenerator();
+        int[] buckets = bucketGenerator(validator.getMinLength(), validator.getMaxLength());
 
         for (int i = 0; i < buckets[0]; i++) {
             result.append(UPPER.charAt(random.nextInt(UPPER.length())));

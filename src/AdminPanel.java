@@ -33,9 +33,9 @@ public class AdminPanel {
     private String updatePassword() {
         int numAttempts = 2;
         String password;
-        System.out.println(Validation.getPasswordPolicy());
-        System.out.println("Please enter a new password: ");
+        System.out.println(validator.getPasswordPolicy());
         for (int i = 0; i < numAttempts; i++) {
+            System.out.print("Please enter a new password: ");
             password = scanner.nextLine();
             if (validator.isValidPassword(password)) {
                 return password;
@@ -47,11 +47,11 @@ public class AdminPanel {
     }
 
     private boolean newUser() {
-        System.out.println("Please type the intended username");
+        System.out.print("Please type the intended username: ");
         String username = scanner.nextLine();
-        System.out.println("Please type the intended password");
+        System.out.print("Please type the intended password: ");
         String password = updatePassword();
-        System.out.println("Please type the intended MFACode");
+        System.out.print("Please type the intended MFACode: ");
         String mfaCode = scanner.nextLine();
 
         if (userDB.findByUsername(username).isPresent()) {
