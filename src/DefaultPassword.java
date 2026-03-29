@@ -18,7 +18,7 @@ public class DefaultPassword {
     private static final String DIGITS = "0123456789";
 
     public DefaultPassword(Validation validator) {
-        this.validator = new Validation();
+        this.validator = validator;
     }
 
     private int[] bucketGenerator(int minLength, int maxLength) {
