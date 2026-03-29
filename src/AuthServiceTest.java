@@ -195,7 +195,7 @@ class AuthServiceTest {
 
         assertNull(service.authenticate("bob", decryptedPassword, "2000000000"), "Confirm test user does not exist before init");
 
-        User bob = new User("bob", decryptedPassword, 2000000000);
+        User bob = new User("bob", encryptedPassword, 2000000000);
         assertTrue(service.saveUser(bob), "Successfully creates the user");
 
         assertEquals(bob, service.authenticate("bob", decryptedPassword, "2000000000"), "True on correct login");

@@ -66,8 +66,8 @@ public class AuthService {
         //Register the temporary user
         User tempUser = new User(username, null ,code);
         //Needs exception handling
-        User finalUser = pwHandler.setPassword(password, tempUser);
-        userDB.save(finalUser);
+        tempUser = pwHandler.setPassword(password, tempUser);
+        userDB.save(tempUser);
         return true;
     }
     public boolean saveUser(User user) {
