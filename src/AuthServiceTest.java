@@ -133,13 +133,13 @@ class AuthServiceTest {
 
         @Override
         public boolean isPassword(String password, User user) {
-            String tempPw = this.cryptographer.encrypt(password, this.alphaKey);
+            String tempPw = this.cryptographer.encrypt(this.alphaKey, password);
             return (Objects.equals(tempPw, user.getPassword()));
         }
 
         @Override
         public User setPassword(String password, User user) {
-            user.setPassword(cryptographer.encrypt(password, this.alphaKey));
+            user.setPassword(cryptographer.encrypt(this.alphaKey, password));
             return user;
         }
     }
