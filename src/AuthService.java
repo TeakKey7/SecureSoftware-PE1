@@ -5,17 +5,14 @@ import java.util.Optional;
  File Name: AuthService.java
  Implements input validation and queries the database to authenticate users
  @author Caleb Metz
- @version 1.0
+ @version 1.1
  */
 
 public class AuthService {
     private final UserDataStore userDB;
     private final Validation validator;
     private final MFAProvider mfaProvider;
-    private final Cryptographer cryptographer;
-
-    private String alphaKey;
-    private int numberKey;
+    private final PasswordHandler pwHandler;
 
     private boolean sanitizeFail(String username, String password, String mfaInput) {
         if (!validator.noSQLInjection(username) || !validator.noSQLInjection(password)) {
@@ -35,29 +32,16 @@ public class AuthService {
         return false;
     }
 
-    public AuthService(UserDataStore userDB, Validation validator, MFAProvider mfaProvider, Cryptographer cryptographer) {
-        this.userDB = userDB;
-        this.validator = validator;
-        this.mfaProvider = mfaProvider;
-        this.cryptographer = cryptographer;
-        alphaKey = "ARGOSRULE";
-        numberKey = 1963;
-    }
-
     public AuthService(
             UserDataStore userDB,
             Validation validator,
             MFAProvider mfaProvider,
-            Cryptographer cryptographer,
-            String alphaKey,
-            int numberKey
+            PasswordHandler pwHandler
     ) {
         this.userDB = userDB;
         this.validator = validator;
         this.mfaProvider = mfaProvider;
-        this.cryptographer = cryptographer;
-        this.alphaKey = alphaKey;
-        this.numberKey = numberKey;
+        this.pwHandler = pwHandler;
     }
 
     public User authenticate(String username, String password, String mfaInput) {
@@ -66,7 +50,7 @@ public class AuthService {
         Optional<User> userOpt = userDB.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (user.getPassword().equals(cryptographer.encrypt(alphaKey, password))) {
+            if (pwHandler.isPassword(password, user)) {
                 if (mfaProvider.verify(user,mfaInput)) {
                     return user;
                 }
@@ -79,8 +63,11 @@ public class AuthService {
         //Ensure all input is valid
         if (sanitizeFail(username, password, mfaCode)) return false;
         int code = Integer.parseInt(mfaCode);
-        //Register the validated user
-        userDB.save(new User(username,cryptographer.encrypt(alphaKey, password),code));
+        //Register the temporary user
+        User tempUser = new User(username, null ,code);
+        //Needs exception handling
+        User finalUser = pwHandler.setPassword(password, tempUser);
+        userDB.save(finalUser);
         return true;
     }
     public boolean saveUser(User user) {
