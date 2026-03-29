@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthServiceTest {
     public static final String encryptedPassword = "Secure123";
     public static final String decryptedPassword = "Unlocked123";
+    public static final String failedCryptoString = "AAAAAAAA";
+    public static final int failedCryptoNumber = 999999999;
     public static final int encryptedCode = 9999;
     public static final int decryptedCode = 0000;
     public static String badInput = "Bad";
@@ -81,22 +84,74 @@ class AuthServiceTest {
     static class MockCryptographer implements Cryptographer {
         @Override
         public String encrypt(String alphaKey, String input) {
-            return encryptedPassword;
+            if (Objects.equals(input, decryptedPassword)) {
+                return encryptedPassword;
+            } else {
+                return failedCryptoString;
+            }
         }
 
         @Override
         public int encrypt(int numberKey, int input) {
-            return encryptedCode;
+            if (input == decryptedCode) {
+                return encryptedCode;
+            } else {
+                return failedCryptoNumber;
+            }
         }
 
         @Override
         public String decrypt(String alphaKey, String input) {
-            return decryptedPassword;
+            if (Objects.equals(input, encryptedPassword)) {
+                return decryptedPassword;
+            } else {
+                return failedCryptoString;
+            }
         }
 
         @Override
         public int decrypt(int numberKey, int input) {
-            return decryptedCode;
+            if (input == encryptedCode) {
+                return decryptedCode;
+            } else {
+                return failedCryptoNumber;
+            }
+        }
+    }
+    static class MockPasswordHandler extends PasswordHandler {
+        private final Cryptographer cryptographer;
+        private final Validation validator;
+        private final DefaultPassword defaultPassword;
+        private final String alphaKey = "ARGOSROCK";
+        private final int numberKey = 1963;
+        public MockPasswordHandler(Cryptographer cryptographer, DefaultPassword defaultPassword, Validation validator) {
+            super(cryptographer, defaultPassword, validator);
+            this.cryptographer = cryptographer;
+            this.validator = validator;
+            this.defaultPassword = defaultPassword;
+        }
+
+        @Override
+        public boolean isPassword(String password, User user) {
+            String tempPw = this.cryptographer.encrypt(password, this.alphaKey);
+            return (Objects.equals(tempPw, user.getPassword()));
+        }
+
+        @Override
+        public User setPassword(String password, User user) {
+            user.setPassword(cryptographer.encrypt(password, this.alphaKey));
+            return user;
+        }
+    }
+
+    static class MockDefaultPassword extends DefaultPassword{
+        public MockDefaultPassword(Validation validator) {
+            super(validator);
+        }
+
+        @Override
+        public String generateDefaultPassword() {
+            return decryptedPassword;
         }
     }
     @Test
@@ -105,11 +160,13 @@ class AuthServiceTest {
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
         MockCryptographer mockCryptographer = new MockCryptographer();
-        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockCryptographer);
+        MockDefaultPassword mockDefaultPassword = new MockDefaultPassword(mockValidation);
+        MockPasswordHandler mockPwHandler = new MockPasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
-        assertEquals(alice, service.authenticate("alice", encryptedPassword, "2000000000"), "True on correct login");
+        assertEquals(alice, service.authenticate("alice", decryptedPassword, "2000000000"), "True on correct login");
         assertNull(service.authenticate("alice", "Password", "2000000000"), "Null on bad password");
-        assertNull(service.authenticate("bob", encryptedPassword, "2000000000"), "Null on bad user");
+        assertNull(service.authenticate("bob", decryptedPassword, "2000000000"), "Null on bad user");
     }
 
     @Test
@@ -118,7 +175,9 @@ class AuthServiceTest {
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
         MockCryptographer mockCryptographer = new MockCryptographer();
-        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockCryptographer);
+        MockDefaultPassword mockDefaultPassword = new MockDefaultPassword(mockValidation);
+        MockPasswordHandler mockPwHandler = new MockPasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
         assertTrue(service.saveUser("alice", encryptedPassword, "2000000000"), "True on successful save");
         assertFalse(service.saveUser("alice", badInput, "2000000000"), "Null on bad password");
@@ -130,14 +189,16 @@ class AuthServiceTest {
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
         MockCryptographer mockCryptographer = new MockCryptographer();
-        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockCryptographer);
+        MockDefaultPassword mockDefaultPassword = new MockDefaultPassword(mockValidation);
+        MockPasswordHandler mockPwHandler = new MockPasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
-        assertNull(service.authenticate("bob", encryptedPassword, "2000000000"), "Confirm test user does not exist before init");
+        assertNull(service.authenticate("bob", decryptedPassword, "2000000000"), "Confirm test user does not exist before init");
 
-        User bob = new User("bob", encryptedPassword, 2000000000);
+        User bob = new User("bob", decryptedPassword, 2000000000);
         assertTrue(service.saveUser(bob), "Successfully creates the user");
 
-        assertEquals(bob, service.authenticate("bob", encryptedPassword, "2000000000"), "True on correct login");
+        assertEquals(bob, service.authenticate("bob", decryptedPassword, "2000000000"), "True on correct login");
     }
 
     @Test
@@ -146,7 +207,9 @@ class AuthServiceTest {
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
         MockCryptographer mockCryptographer = new MockCryptographer();
-        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockCryptographer);
+        MockDefaultPassword mockDefaultPassword = new MockDefaultPassword(mockValidation);
+        MockPasswordHandler mockPwHandler = new MockPasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
+        AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
         service.authenticate("alice", badInput, "2000000000");
         boolean result = fakeDb.dbWasQueried;

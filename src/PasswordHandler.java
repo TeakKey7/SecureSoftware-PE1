@@ -9,8 +9,8 @@ public class PasswordHandler {
     private final Cryptographer cryptographer;
     private final Validation validator;
     private final DefaultPassword defaultPassword;
-    private String alphaKey;
-    private int numberKey;
+    private String alphaKey = "ARGOSROCK";
+    private int numberKey = 1963;
 
     public PasswordHandler(
             Cryptographer cryptographer,

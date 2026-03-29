@@ -16,6 +16,8 @@ public class LoginApp {
         FileUserDB userdb = new FileUserDB("default.txt");
         Validation validator = new Validation();
         Cryptographer vigenere = new Vigenere();
+        DefaultPassword defaultPassword = new DefaultPassword(validator);
+        PasswordHandler pwHandler = new PasswordHandler(vigenere, defaultPassword, validator);
 
         String alphaKey = "ARGOSROCK";
 
@@ -23,7 +25,7 @@ public class LoginApp {
                 userdb,
                 validator,
                 new SimpleMFA(validator),
-                vigenere
+                pwHandler
         );
         if (!userdb.findByUsername("scientist").isPresent()) {
             auth.saveUser("scientist", "BlAckM3sa1", "1119199800");
