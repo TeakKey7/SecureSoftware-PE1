@@ -98,7 +98,7 @@ public class PasswordHandlerTest {
         }
     }
     @Test
-    void testIsPassword() {
+    void testIsPassword() throws Validation.InvalidPasswordException {
         PasswordHandlerTest.MockValidation mockValidation = new PasswordHandlerTest.MockValidation();
         PasswordHandlerTest.MockCryptographer mockCryptographer = new PasswordHandlerTest.MockCryptographer();
         PasswordHandlerTest.MockDefaultPassword mockDefaultPassword = new PasswordHandlerTest.MockDefaultPassword(mockValidation);
@@ -108,9 +108,7 @@ public class PasswordHandlerTest {
         assertDoesNotThrow(() -> pwHandler.isPassword(decryptedPassword, alice),
                 "Should not throw an exception on correct login");
 
-        assertThrows(Validation.InvalidPasswordException.class, () -> {
-            pwHandler.isPassword(decryptedPassword2, alice);
-        }, "Should throw InvalidPasswordException on wrong password");
+        assertFalse(pwHandler.isPassword(decryptedPassword2, alice), "False on wrong password");
 
         assertThrows(Validation.InvalidPasswordException.class, () -> {
             pwHandler.isPassword(decryptedBadPassword, alice);

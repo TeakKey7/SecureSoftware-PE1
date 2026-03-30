@@ -21,6 +21,7 @@ class AuthServiceTest {
     public static final int encryptedCode = 9999;
     public static final int decryptedCode = 0000;
     public static String badInput = "Bad";
+    public static final String badPassword = "BADD";
     User alice = new User("alice", encryptedPassword, 2000000000);
     //Mock written by Gemini
     class MockDB implements UserDataStore {
@@ -78,6 +79,11 @@ class AuthServiceTest {
         public boolean noSQLInjection(String input) {
             verifySQLInjectionWasCalled = true;
             return (!input.equals(badInput));
+        }
+
+        @Override
+        public void isValidPassword(String password) throws Validation.InvalidPasswordException {
+            if (password.equals(badPassword)) throw new InvalidPasswordException("Invalid password");
         }
 
     }
@@ -165,7 +171,8 @@ class AuthServiceTest {
         AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
         assertEquals(alice, service.authenticate("alice", decryptedPassword, "2000000000"), "True on correct login");
-        assertNull(service.authenticate("alice", "Password", "2000000000"), "Null on bad password");
+        assertThrows(Validation.InvalidPasswordException.class, () -> service.authenticate("alice", badPassword, "2000000000"),
+                "Throw on bad password");
         assertNull(service.authenticate("bob", decryptedPassword, "2000000000"), "Null on bad user");
     }
 
@@ -181,7 +188,7 @@ class AuthServiceTest {
 
         assertTrue(service.saveUser("alice", encryptedPassword, "2000000000"), "True on successful save");
         assertThrows(Validation.InvalidPasswordException.class, () -> {
-            service.saveUser("alice", badInput, "2000000000");
+            service.saveUser("alice", badPassword, "2000000000");
         }, "Throws exception on bad input");
     }
 
