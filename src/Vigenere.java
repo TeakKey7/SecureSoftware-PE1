@@ -1,5 +1,3 @@
-import jdk.internal.util.xml.impl.Pair;
-
 /**
  * CEN 4078 Programming Exercise 2
  * File Name: Vigenere.java

@@ -53,7 +53,6 @@ public class AdminPanel {
     private boolean newUser() throws DefaultPassword.DefaultPasswordFailureException, Validation.InvalidPasswordException {
             System.out.print("Please type the intended username: ");
             String username = scanner.nextLine();
-            System.out.print("Please type the intended password: ");
             String password = updatePassword();
             System.out.print("Please type the intended MFACode: ");
             String mfaCode = scanner.nextLine();
