@@ -153,7 +153,7 @@ public class PasswordHandlerTest {
         User bob = new User("bob", encryptedPassword, 2000000000);
 
         User user = pwHandler.setPassword(decryptedBadPassword, bob);
-        assertNotEquals(encryptedBadPassword, user.getPassword(), "Ensure bad password was not set");
+        assertNull(user);
         assertTrue(mockValidation.verifyValidPasswordWasCalled, "Valid password check was called");
     }
 
