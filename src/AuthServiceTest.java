@@ -155,7 +155,7 @@ class AuthServiceTest {
         }
     }
     @Test
-    void testLogin() {
+    void testLogin() throws Validation.InvalidPasswordException {
         MockDB fakeDb = new MockDB();
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
@@ -170,7 +170,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void testSave() {
+    void testSave() throws Validation.InvalidPasswordException {
         MockDB fakeDb = new MockDB();
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
@@ -180,11 +180,13 @@ class AuthServiceTest {
         AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
         assertTrue(service.saveUser("alice", encryptedPassword, "2000000000"), "True on successful save");
-        assertFalse(service.saveUser("alice", badInput, "2000000000"), "Null on bad password");
+        assertThrows(Validation.InvalidPasswordException.class, () -> {
+            service.saveUser("alice", badInput, "2000000000");
+        }, "Throws exception on bad input");
     }
 
     @Test
-    void testSaveAndLogin() {
+    void testSaveAndLogin() throws Validation.InvalidPasswordException {
         MockDB fakeDb = new MockDB();
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
@@ -202,7 +204,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void testSQLInjectionCheckCalledOnAuth() {
+    void testSQLInjectionCheckCalledOnAuth() throws Validation.InvalidPasswordException {
         MockDB fakeDb = new MockDB();
         MockMFA mockMFA = new MockMFA();
         MockValidation mockValidation = new MockValidation();
@@ -211,7 +213,7 @@ class AuthServiceTest {
         MockPasswordHandler mockPwHandler = new MockPasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
         AuthService service = new AuthService(fakeDb, mockValidation, mockMFA, mockPwHandler);
 
-        service.authenticate("alice", badInput, "2000000000");
+        service.authenticate(badInput, decryptedPassword, "2000000000");
         boolean result = fakeDb.dbWasQueried;
         assertFalse(result, "Ensure bad query was not passed on");
         assertTrue(mockValidation.verifySQLInjectionWasCalled, "SQL injection check was called");

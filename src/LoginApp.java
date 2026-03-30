@@ -27,15 +27,20 @@ public class LoginApp {
                 new SimpleMFA(validator),
                 pwHandler
         );
-        if (!userdb.findByUsername("scientist").isPresent()) {
-            auth.saveUser("scientist", "BlAckM3sa1", "1119199800");
+        try {
+            if (!userdb.findByUsername("scientist").isPresent()) {
+                auth.saveUser("scientist", "BlAckM3sa1", "1119199800");
+            }
+            if (!userdb.findByUsername("engineer").isPresent()) {
+                auth.saveUser("engineer", "G0rdonFr33", "1119199800");
+            }
+            if (!userdb.findByUsername("security").isPresent()) {
+                auth.saveUser("security", "Barn3yCal", "1119199800");
+            }
+        } catch (Validation.InvalidPasswordException e) {
+            System.out.println(e.getMessage());
         }
-        if (!userdb.findByUsername("engineer").isPresent()) {
-            auth.saveUser("engineer", "G0rdonFr33", "1119199800");
-        }
-        if (!userdb.findByUsername("security").isPresent()) {
-            auth.saveUser("security", "Barn3yCal", "1119199800");
-        }
+
         //Removed test print statements from project 1. Encypted passwords
 
         String username;
@@ -76,13 +81,18 @@ public class LoginApp {
         }
 
         System.out.println("\nAuthenticating...");
-        User userLogin = auth.authenticate(username,password,mfaString);
-        if (userLogin != null) {
-            AdminPanel adminPanel = new AdminPanel(auth, userdb, userLogin);
-            adminPanel.start();
-        } else {
-            System.out.println("Failed to login.");
-            System.exit(1);
+        try {
+            User userLogin = auth.authenticate(username,password,mfaString);
+
+            if (userLogin != null) {
+                AdminPanel adminPanel = new AdminPanel(auth, userdb, userLogin);
+                adminPanel.start();
+            } else {
+                System.out.println("Failed to login.");
+                System.exit(1);
+            }
+        } catch (Validation.InvalidPasswordException e) {
+            System.out.println(e.getMessage());
         }
 
     }

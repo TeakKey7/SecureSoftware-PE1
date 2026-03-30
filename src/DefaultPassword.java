@@ -17,6 +17,12 @@ public class DefaultPassword {
     private static final String LOWER = "abcdefghijklmnopqrstuvwxyz";
     private static final String DIGITS = "0123456789";
 
+    public class DefaultPasswordFailureException extends Exception {
+        public DefaultPasswordFailureException(String message) {
+            super(message);
+        }
+    }
+
     public DefaultPassword(Validation validator) {
         this.validator = validator;
     }
@@ -53,7 +59,7 @@ public class DefaultPassword {
         return new int[]{numUpper, numLower, numDigit};
     }
 
-    public String generateDefaultPassword() {
+    public String generateDefaultPassword() throws DefaultPasswordFailureException {
 
         StringBuilder result = new StringBuilder();
 
@@ -80,8 +86,10 @@ public class DefaultPassword {
             characters[i] = temp;
         }
         String finalString = new String(characters);
-        if (!validator.isValidPassword(finalString)) {
-         return null;
+        try {
+            validator.isValidPassword(finalString);
+        } catch (Validation.InvalidPasswordException e) {
+            throw new DefaultPasswordFailureException("Unable to create default password.");
         }
         sendMessage();
         return finalString;

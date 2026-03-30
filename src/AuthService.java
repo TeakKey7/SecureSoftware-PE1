@@ -14,7 +14,8 @@ public class AuthService {
     private final MFAProvider mfaProvider;
     private final PasswordHandler pwHandler;
 
-    private boolean sanitizeFail(String username, String password, String mfaInput) {
+    private boolean sanitizeFail(String username, String password, String mfaInput)
+            throws Validation.InvalidPasswordException {
         if (!validator.noSQLInjection(username) || !validator.noSQLInjection(password)) {
             //Remove in prod
             System.out.println("Invalid input detected.");
@@ -25,10 +26,7 @@ public class AuthService {
             System.out.println("Invalid code detected.");
             return true;
         }
-        if(!validator.isValidPassword(password)) {
-            System.out.println("Weak Password.");
-            return true;
-        }
+        validator.isValidPassword(password);
         return false;
     }
 
@@ -44,7 +42,8 @@ public class AuthService {
         this.pwHandler = pwHandler;
     }
 
-    public User authenticate(String username, String password, String mfaInput) {
+    public User authenticate(String username, String password, String mfaInput)
+            throws Validation.InvalidPasswordException {
         //Grammatically incorrect, logically good enough. Fails if SQL injection detected.
         if (sanitizeFail(username, password, mfaInput)) return null;
         Optional<User> userOpt = userDB.findByUsername(username);
@@ -59,7 +58,8 @@ public class AuthService {
         return null;
     }
 
-    public boolean saveUser(String username, String password, String mfaCode) {
+    public boolean saveUser(String username, String password, String mfaCode)
+            throws Validation.InvalidPasswordException {
         //Ensure all input is valid
         if (sanitizeFail(username, password, mfaCode)) return false;
         int code = Integer.parseInt(mfaCode);
@@ -70,7 +70,7 @@ public class AuthService {
         userDB.save(tempUser);
         return true;
     }
-    public boolean saveUser(User user) {
+    public boolean saveUser(User user) throws Validation.InvalidPasswordException {
         //Ensure all input is valid
         if (sanitizeFail(user.getUserName(), user.getPassword(), String.valueOf(user.getMfaCode()))) return false;
         //Register the validated user

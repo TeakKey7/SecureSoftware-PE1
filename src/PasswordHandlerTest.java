@@ -1,14 +1,8 @@
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * CEN 4078 Programming Exercise 3
@@ -39,9 +33,11 @@ public class PasswordHandlerTest {
             return (!input.equals(decryptedBadPassword));
         }
         @Override
-        public boolean isValidPassword(String input) {
+        public void isValidPassword(String input) throws InvalidPasswordException {
             verifyValidPasswordWasCalled = true;
-            return (!input.equals(decryptedBadPassword));
+            if (input.equals(decryptedBadPassword)) {
+                throw new InvalidPasswordException("Bad password.");
+            };
         }
 
     }
@@ -109,9 +105,16 @@ public class PasswordHandlerTest {
 
         PasswordHandler pwHandler = new PasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
 
-        assertTrue(pwHandler.isPassword(decryptedPassword, alice), "True on correct login");
-        assertFalse(pwHandler.isPassword(decryptedPassword2, alice), "False on wrong password");
-        assertFalse(pwHandler.isPassword(decryptedBadPassword, alice), "False on bad password");
+        assertDoesNotThrow(() -> pwHandler.isPassword(decryptedPassword, alice),
+                "Should not throw an exception on correct login");
+
+        assertThrows(Validation.InvalidPasswordException.class, () -> {
+            pwHandler.isPassword(decryptedPassword2, alice);
+        }, "Should throw InvalidPasswordException on wrong password");
+
+        assertThrows(Validation.InvalidPasswordException.class, () -> {
+            pwHandler.isPassword(decryptedBadPassword, alice);
+        }, "Should throw InvalidPasswordException on bad password");
     }
 
     @Test
@@ -123,7 +126,9 @@ public class PasswordHandlerTest {
         PasswordHandler pwHandler = new PasswordHandler(mockCryptographer, mockDefaultPassword, mockValidation);
         User bob = new User("bob", encryptedPassword, 2000000000);
         assertEquals(encryptedPassword, bob.getPassword(), "Test user initializes");
-        pwHandler.setPassword(decryptedPassword2, bob);
+        assertDoesNotThrow(() -> {
+            pwHandler.setPassword(decryptedPassword2, bob);
+        }, "Should not throw an exception on valid login");
         assertEquals(encryptedPassword2, bob.getPassword(), "Return user with new password");
     }
 
@@ -137,8 +142,9 @@ public class PasswordHandlerTest {
 
         User bob = new User("bob", encryptedBadPassword, 2000000000);
 
-        boolean result = pwHandler.isPassword(decryptedBadPassword, bob);
-        assertFalse(result, "Ensure bad password cannot validate");
+        assertThrows(Validation.InvalidPasswordException.class, () -> {
+            pwHandler.isPassword(decryptedBadPassword, bob);
+        }, "Ensure bad password throws exception");
         assertTrue(mockValidation.verifyValidPasswordWasCalled, "Valid password check was called");
     }
 
@@ -152,8 +158,9 @@ public class PasswordHandlerTest {
 
         User bob = new User("bob", encryptedPassword, 2000000000);
 
-        User user = pwHandler.setPassword(decryptedBadPassword, bob);
-        assertNull(user);
+        assertThrows(Validation.InvalidPasswordException.class, () -> {
+            pwHandler.setPassword(decryptedBadPassword, bob);
+        }, "Ensure bad password throws exception");
         assertTrue(mockValidation.verifyValidPasswordWasCalled, "Valid password check was called");
     }
 

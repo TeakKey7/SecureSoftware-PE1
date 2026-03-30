@@ -35,17 +35,13 @@ public class PasswordHandler {
         this.alphaKey = alphaKey;
     }
 
-    public boolean isPassword(String password, User user) {
-        if (!validator.isValidPassword(password)) {
-            return false;
-        }
+    public boolean isPassword(String password, User user) throws Validation.InvalidPasswordException {
+        validator.isValidPassword(password);
         return (Objects.equals(cryptographer.encrypt(alphaKey, password), user.getPassword()));
     }
 
-    public User setPassword(String password, User user) {
-        if (!validator.isValidPassword(password)) {
-            return null;
-        }
+    public User setPassword(String password, User user) throws Validation.InvalidPasswordException {
+        validator.isValidPassword(password);
         user.setPassword(cryptographer.encrypt(alphaKey, password));
         return user;
     }

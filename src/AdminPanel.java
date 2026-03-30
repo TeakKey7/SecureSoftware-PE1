@@ -30,35 +30,39 @@ public class AdminPanel {
 
     }
 
-    private String updatePassword() {
+    private String updatePassword() throws DefaultPassword.DefaultPasswordFailureException {
         int numAttempts = 2;
         String password;
         System.out.println(validator.getPasswordPolicy());
         for (int i = 0; i < numAttempts; i++) {
             System.out.print("Please enter a new password: ");
-            password = scanner.nextLine();
-            if (validator.isValidPassword(password)) {
+            try {
+                password = scanner.nextLine();
+                validator.isValidPassword(password);
                 return password;
+            } catch (Validation.InvalidPasswordException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Please try again.");
             }
-            System.out.println("Please try again.");
         }
         System.out.println("Too many attempts.");
         return defaultPassword.generateDefaultPassword();
     }
 
-    private boolean newUser() {
-        System.out.print("Please type the intended username: ");
-        String username = scanner.nextLine();
-        System.out.print("Please type the intended password: ");
-        String password = updatePassword();
-        System.out.print("Please type the intended MFACode: ");
-        String mfaCode = scanner.nextLine();
+    private boolean newUser() throws DefaultPassword.DefaultPasswordFailureException, Validation.InvalidPasswordException {
+            System.out.print("Please type the intended username: ");
+            String username = scanner.nextLine();
+            System.out.print("Please type the intended password: ");
+            String password = updatePassword();
+            System.out.print("Please type the intended MFACode: ");
+            String mfaCode = scanner.nextLine();
 
-        if (userDB.findByUsername(username).isPresent()) {
-            System.out.println("Unable to create user.");
-            return false;
-        }
-        return authService.saveUser(username, password, mfaCode);
+            if (userDB.findByUsername(username).isPresent()) {
+                System.out.println("Unable to create user.");
+                return false;
+            }
+            return authService.saveUser(username, password, mfaCode);
     }
 
     public void start() {
@@ -98,6 +102,10 @@ public class AdminPanel {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Please input a valid integer!");
+            } catch (DefaultPassword.DefaultPasswordFailureException e) {
+                System.out.println("An error occurred while generating a default password.");
+            } catch (Validation.InvalidPasswordException e) {
+                System.out.println(e.getMessage());
             }
         }
     }

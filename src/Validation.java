@@ -15,6 +15,12 @@ public class Validation {
     private final int minLength;
     private final int maxLength;
 
+    public static class InvalidPasswordException extends Exception {
+        public InvalidPasswordException(String message) {
+            super(message);
+        }
+    }
+
     public Validation(){
         sensitiveChars = new char[]{'/', '-', ';', '"'};
         minLength = 8;
@@ -43,25 +49,29 @@ public class Validation {
         return true;
     }
 
-    public boolean isValidPassword(String input) {
+    public void isValidPassword(String input) throws InvalidPasswordException {
         //Length between 8-12 characters
         if (input.length() < minLength || input.length() > maxLength) {
-            return false;
+            throw new InvalidPasswordException(
+                    "Password is not between " +
+                            minLength +
+                            "-" +
+                            maxLength +
+                            " characters."
+            );
         }
         //Contains at least one upper [Cite: Gemini & IntelliJ]
         if (input.chars().noneMatch(Character::isUpperCase)) {
-            return false;
+            throw new InvalidPasswordException("Password does not contain any uppercase characters.");
         };
         //Contains at least one lower
         if (input.chars().noneMatch(Character::isLowerCase)) {
-            return false;
+            throw new InvalidPasswordException("Password does not contain any lowercase characters.");
         }
         //Contains at least one number
         if (input.chars().noneMatch(Character::isDigit)) {
-            return false;
+            throw new InvalidPasswordException("Password does not contain any numbers.");
         }
-        //Meets all requirements
-        return true;
     }
     public boolean noIntOverflow(String input) {
         if (input == null || input.isEmpty()) {

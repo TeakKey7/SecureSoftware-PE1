@@ -31,41 +31,40 @@ class ValidationTest {
 
     @Test
     void isValidPassword_badLength() {
-        assertFalse(val.isValidPassword("Pass123"), "Short password should return false");
-        assertFalse(val.isValidPassword("Password99999"), "Long password should return false");
+        assertThrows(Validation.InvalidPasswordException.class, () ->
+                        val.isValidPassword("Pass123"),
+                "Short password should throw InvalidPasswordException");
+
+        assertThrows(Validation.InvalidPasswordException.class, () ->
+                        val.isValidPassword("Password99999"),
+                "Long password should throw InvalidPasswordException");
     }
 
     @Test
-    void isValidPassword_goodLength() {
-        assertTrue(val.isValidPassword("Password123"), "Correct password length should return true");
+    void isValidPassword_goodPassword() {
+        assertDoesNotThrow(() -> val.isValidPassword("Password123"),
+                "Correct password length should not throw an exception");
     }
 
     @Test
     void isValidPassword_badUpper() {
-        assertFalse(val.isValidPassword("password123"), "Lowercase password should return false");
-    }
-    @Test
-    void isValidPassword_goodUpper() {
-        assertTrue(val.isValidPassword("Password123"), "Good password should return true");
+        assertThrows(Validation.InvalidPasswordException.class, () ->
+                        val.isValidPassword("password123"),
+                "Lowercase password should throw exception for missing Uppercase");
     }
 
     @Test
     void isValidPassword_badLower() {
-        assertFalse(val.isValidPassword("PASSWORD123"), "Lowercase password should return false");
-    }
-    @Test
-    void isValidPassword_goodLower() {
-        assertTrue(val.isValidPassword("Password123"), "Good password should return true");
-    }
-
-    @Test
-    void isValidPassword_goodNumeric() {
-        assertTrue(val.isValidPassword("Password123"), "Numeric password should return true");
+        assertThrows(Validation.InvalidPasswordException.class, () ->
+                        val.isValidPassword("PASSWORD123"),
+                "Uppercase password should throw exception for missing Lowercase");
     }
 
     @Test
     void isValidPassword_badNumeric() {
-        assertFalse(val.isValidPassword("Password"), "Non numeric password should return false");
+        assertThrows(Validation.InvalidPasswordException.class, () ->
+                        val.isValidPassword("Password"),
+                "Non-numeric password should throw exception for missing Digit");
     }
 
     @Test
@@ -90,8 +89,11 @@ class ValidationTest {
         String newShort = "Password12345";
         String newGood = "LongPassword12345";
         String newLong = "ThisIsAVeryVeryVeryLongPassword12345";
-        assertTrue(val2.isValidPassword(newGood), "Between 15 and 20 passes");
-        assertFalse(val2.isValidPassword(newShort), "Below 15 now fails");
-        assertFalse(val2.isValidPassword(newLong), "Above 20 still fails");
+        assertDoesNotThrow(() -> val2.isValidPassword(newGood),
+                "Between 15 and 20 passes");
+        assertThrows(Validation.InvalidPasswordException.class, () -> val2.isValidPassword(newShort),
+                "Below 15 now fails");
+        assertThrows(Validation.InvalidPasswordException.class, () -> val2.isValidPassword(newLong),
+                "Above 20 still fails");
     }
 }
