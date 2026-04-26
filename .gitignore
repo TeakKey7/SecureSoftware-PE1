@@ -44,9 +44,5 @@ replay_pid*
 #Java files
 /out
 
-#IntelliJ files
-.idea
-.idea/*
-
 default.txt
 *.zip
