@@ -111,6 +111,9 @@ public class FileUserDB implements UserDataStore{
     @Override
     public void delete(String userName) {
         int index = findIndex(userName);
+        if (index < 0) {
+            return;
+        }
         users.remove(index);
         saveToFile();
     }
