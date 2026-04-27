@@ -86,6 +86,29 @@ class FileUserDBTest {
         assertEquals(2000000000, diskUser.getMfaCode(), "Disk should have new MFA");
     }
 
+    @Test
+    void test_DeleteExistingUser() {
+
+        User charlie = new User("charlie", "oldPass", 2000000000);
+
+        db.save(charlie);
+
+        assertEquals(Optional.of(charlie), db.findByUsername("charlie"), "Confirm user loaded");
+
+        db.delete("charlie");
+
+        assertEquals(Optional.empty(), db.findByUsername("charlie"), "Successfully deletes a user from DB");
+
+    }
+
+    @Test
+    void test_DeleteNonExistentUser() {
+        FileUserDB diskCheck = new FileUserDB(TEST_FILE);
+        assertDoesNotThrow(() -> diskCheck.delete("charlie"),
+                "Non existent user should not throw an exception");
+        diskCheck.delete("charlie");
+    }
+
     // --- TEST 3: Handling Missing Files ---
     @Test
     void testLoadNonExistentFile() {
