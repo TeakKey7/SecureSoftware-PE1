@@ -1,5 +1,5 @@
 import java.io.Console;
-import java.lang.reflect.MalformedParameterizedTypeException;
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -10,10 +10,17 @@ import java.util.Scanner;
  @version 2.0
  */
 
-public class LoginApp {
+public class LoginAppInjection {
     public static void main(String[] args) {
+        DatabaseConfig dbconfig;
+        try {
+            dbconfig = DatabaseConfig.load("/database.properties");
+        } catch (IOException e) {
+            System.out.println("Could not open database.properties.");
+            return;
+        }
 
-        FileUserDB userdb = new FileUserDB("default.txt");
+        JdbcRepository userdb = new JdbcRepository(dbconfig);
         Validation validator = new Validation();
         Cryptographer vigenere = new Vigenere();
         DefaultPassword defaultPassword = new DefaultPassword(validator);
@@ -82,7 +89,7 @@ public class LoginApp {
 
         System.out.println("\nAuthenticating...");
         try {
-            User userLogin = auth.authenticate(username,password,mfaString);
+            User userLogin = auth.authenticate(username, password, mfaString);
 
             if (userLogin != null) {
                 AdminPanel adminPanel = new AdminPanel(auth, userdb, userLogin);
