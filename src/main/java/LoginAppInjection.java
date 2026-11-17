@@ -20,7 +20,7 @@ public class LoginAppInjection {
             return;
         }
 
-        JdbcRepository userdb = new JdbcRepository(dbconfig);
+        VulnerableJdbcRepository userdb = new VulnerableJdbcRepository(dbconfig);
         Validation validator = new Validation();
         Cryptographer vigenere = new Vigenere();
         DefaultPassword defaultPassword = new DefaultPassword(validator);

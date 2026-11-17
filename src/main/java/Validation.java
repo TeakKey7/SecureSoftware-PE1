@@ -22,7 +22,7 @@ public class Validation {
     }
 
     public Validation(){
-        sensitiveChars = new char[]{'/', '-', ';', '"'};
+        sensitiveChars = new char[]{'$'};
         minLength = 8;
         maxLength = 12;
     }
